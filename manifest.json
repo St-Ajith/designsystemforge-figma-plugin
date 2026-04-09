@@ -1,0 +1,22 @@
+{
+  "name": "designsystem.build",
+  "id": "1480526156040809851",
+  "api": "1.0.0",
+  "main": "code.js",
+  "ui": "ui.html",
+  "editorType": [
+    "figma"
+  ],
+  "documentAccess": "dynamic-page",
+  "networkAccess": {
+    "allowedDomains": [
+      "https://designsystemforge-production.up.railway.app",
+      "https://earnest-liberation-production-6013.up.railway.app",
+      "https://design-system.up.railway.app"
+    ],
+    "reasoning": "Fetches design system tokens and components from designsystem.build API to build the Figma file, and submits Figma sync data back for review"
+  },
+  "permissions": [
+    "currentuser"
+  ]
+}
