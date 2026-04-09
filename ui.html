@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;font-family:-apple-system,'Inter',sans-serif}
+body{background:#fff;width:100%;min-height:580px;overflow-x:hidden;overflow-y:auto}
+
+/* ── Header ── */
+.hdr{background:#0F172A;color:#fff;padding:14px 18px;display:flex;align-items:center;gap:10px}
+.hdr-logo{width:32px;height:32px;background:linear-gradient(135deg,#6366F1,#8B5CF6);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:#fff;flex-shrink:0}
+.hdr-info h1{font-size:13px;font-weight:700;color:#F1F5F9}
+.hdr-info p{font-size:10px;color:#64748B;margin-top:1px}
+.hdr-badge{margin-left:auto;font-size:10px;font-weight:600;color:#22D3EE;background:#22D3EE18;padding:3px 8px;border-radius:12px;border:1px solid #22D3EE30}
+
+/* ── Tabs ── */
+.tabs{display:flex;border-bottom:1px solid #E2E8F0;background:#F8FAFC}
+.tab{flex:1;padding:9px 0;text-align:center;font-size:11px;font-weight:600;color:#94A3B8;cursor:pointer;border-bottom:2px solid transparent;transition:all .15s;letter-spacing:.01em}
+.tab.active{color:#6366F1;border-bottom-color:#6366F1;background:#fff}
+.tab:hover:not(.active){color:#475569;background:#F1F5F9}
+
+/* ── Body ── */
+.body{padding:14px 16px;overflow-y:auto;max-height:calc(640px - 120px);width:100%;box-sizing:border-box}
+.screen{display:none}.screen.active{display:block}
+
+/* ── Token input ── */
+.input-label{font-size:11px;font-weight:600;color:#475569;margin-bottom:5px;display:block;letter-spacing:.04em;text-transform:uppercase}
+.input{width:100%;border:1.5px solid #E2E8F0;border-radius:8px;padding:9px 11px;font-size:12px;color:#1E293B;transition:border-color .15s;background:#fff}
+.input:focus{outline:none;border-color:#6366F1;box-shadow:0 0 0 3px #6366F130}
+.input-group{margin-bottom:12px}
+.input-hint{font-size:10px;color:#94A3B8;margin-top:4px}
+
+/* ── Buttons ── */
+.btn{width:100%;padding:10px;border:none;border-radius:9px;font-size:12px;font-weight:700;cursor:pointer;transition:all .15s;letter-spacing:.02em}
+.btn-primary{background:linear-gradient(135deg,#6366F1,#8B5CF6);color:#fff}
+.btn-primary:hover{opacity:.9;transform:translateY(-1px)}
+.btn-primary:disabled{background:#94A3B8;cursor:not-allowed;transform:none;opacity:1}
+.btn-secondary{background:#F1F5F9;color:#475569;border:1px solid #E2E8F0;margin-top:8px}
+.btn-secondary:hover{background:#E2E8F0}
+.btn-danger{background:#FEF2F2;color:#DC2626;border:1px solid #FECACA;margin-top:8px}
+.btn-sm{padding:6px 12px;width:auto;font-size:11px;border-radius:7px}
+
+/* ── Progress ── */
+.progress-wrap{margin:14px 0}
+.progress-label{display:flex;justify-content:space-between;margin-bottom:6px}
+.progress-label span{font-size:11px;color:#64748B}
+.progress-label .pct{font-weight:600;color:#6366F1}
+.progress-bar{height:6px;background:#E2E8F0;border-radius:3px;overflow:hidden}
+.progress-fill{height:100%;background:linear-gradient(90deg,#6366F1,#8B5CF6);border-radius:3px;transition:width .4s ease;width:0%}
+
+/* ── Steps ── */
+.steps{margin:10px 0}
+.step{display:flex;align-items:center;gap:8px;padding:4px 0;font-size:11px;color:#94A3B8}
+.step.done{color:#22C55E}
+.step.active{color:#6366F1;font-weight:600}
+.step.error{color:#EF4444}
+.step-icon{width:16px;height:16px;border-radius:50%;background:currentColor;display:flex;align-items:center;justify-content:center;font-size:8px;color:#fff;flex-shrink:0}
+.step.done .step-icon::after{content:'✓'}
+.step.active .step-icon{animation:pulse 1s infinite}
+.step.error .step-icon::after{content:'✗'}
+.step:not(.done):not(.active):not(.error) .step-icon{background:#E2E8F0}
+
+/* ── Cards ── */
+.card{background:#F8FAFC;border:1px solid #E2E8F0;border-radius:10px;padding:12px 14px;margin-bottom:10px}
+.card-title{font-size:11px;font-weight:700;color:#1E293B;margin-bottom:4px;text-transform:uppercase;letter-spacing:.05em}
+.card-text{font-size:11px;color:#64748B;line-height:1.5}
+.card-success{background:#F0FDF4;border-color:#BBF7D0}
+.card-error{background:#FEF2F2;border-color:#FECACA}
+.card-info{background:#EFF6FF;border-color:#BFDBFE}
+.card-warning{background:#FFFBEB;border-color:#FDE68A}
+
+/* ── System preview ── */
+.system-preview{background:#0F172A;border-radius:10px;padding:16px;margin-bottom:12px}
+.system-name{font-size:16px;font-weight:700;color:#F1F5F9;margin-bottom:6px}
+.system-badges{display:flex;gap:6px;flex-wrap:wrap}
+.sys-badge{font-size:10px;font-weight:600;padding:3px 8px;border-radius:6px;background:#1E293B;color:#94A3B8}
+.sys-badge.brand{background:#6366F115;color:#818CF8;border:1px solid #6366F130}
+
+/* ── Change list ── */
+.change-list{max-height:240px;overflow-y:auto}
+.change-item{display:flex;align-items:flex-start;gap:8px;padding:8px 10px;border-bottom:1px solid #F1F5F9;cursor:pointer;transition:background .1s}
+.change-item:hover{background:#F8FAFC}
+.change-check{width:16px;height:16px;border:1.5px solid #CBD5E1;border-radius:4px;flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.change-check.checked{background:#6366F1;border-color:#6366F1}
+.change-check.checked::after{content:'✓';color:#fff;font-size:9px;font-weight:700}
+.change-meta{flex:1;min-width:0}
+.change-field{font-size:11px;font-weight:600;color:#1E293B;margin-bottom:2px}
+.change-values{font-size:10px;color:#94A3B8;display:flex;gap:6px;align-items:center}
+.change-old{text-decoration:line-through;opacity:.7}
+.change-arrow{color:#94A3B8}
+.change-new{color:#22C55E;font-weight:600}
+.change-type{font-size:9px;font-weight:700;padding:1px 5px;border-radius:3px;text-transform:uppercase;letter-spacing:.05em;flex-shrink:0;margin-top:2px}
+.ct-color{background:#EFF6FF;color:#2563EB}
+.ct-typography{background:#F5F3FF;color:#7C3AED}
+.ct-spacing{background:#FFF7ED;color:#EA580C}
+.ct-radius{background:#F0FDF4;color:#16A34A}
+.ct-shadow{background:#F9FAFB;color:#6B7280}
+
+/* ── Colour swatch ── */
+.swatch{width:12px;height:12px;border-radius:3px;flex-shrink:0;border:1px solid rgba(0,0,0,.1)}
+
+/* ── Stats row ── */
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0}
+.stat{text-align:center;background:#F8FAFC;border:1px solid #E2E8F0;border-radius:8px;padding:10px}
+.stat-val{font-size:22px;font-weight:700;color:#1E293B}
+.stat-lbl{font-size:10px;color:#94A3B8;margin-top:2px;text-transform:uppercase;letter-spacing:.05em}
+
+/* ── Select ── */
+.select{width:100%;border:1.5px solid #E2E8F0;border-radius:8px;padding:8px 10px;font-size:12px;color:#1E293B;background:#fff;cursor:pointer}
+.select:focus{outline:none;border-color:#6366F1}
+
+/* ── Section header ── */
+.section-hdr{font-size:10px;font-weight:700;color:#94A3B8;text-transform:uppercase;letter-spacing:.08em;margin:14px 0 8px}
+
+/* ── Alert ── */
+.alert{border-radius:8px;padding:10px 12px;font-size:11px;line-height:1.5;margin:10px 0}
+.alert-warn{background:#FFFBEB;border:1px solid #FDE68A;color:#92400E}
+.alert-info{background:#EFF6FF;border:1px solid #BFDBFE;color:#1E40AF}
+
+/* ── Radio buttons ── */
+.radio-group{width:100%;box-sizing:border-box;display:flex;gap:6px;margin-bottom:10px}
+.radio-opt{flex:1;text-align:center;padding:7px;border:1.5px solid #E2E8F0;border-radius:7px;font-size:11px;font-weight:600;color:#64748B;cursor:pointer;transition:all .15s}
+.radio-opt.selected{border-color:#6366F1;background:#6366F115;color:#6366F1}
+
+/* ── Architecture pill ── */
+.arch-badge{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:700;padding:3px 8px;border-radius:5px;background:#5F3DC415;color:#7C3AED;border:1px solid #7C3AED30;margin-bottom:8px}
+
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+@keyframes spin{to{transform:rotate(360deg)}}
+.spin{animation:spin .7s linear infinite;display:inline-block}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <div class="hdr-logo">◈</div>
+  <div class="hdr-info">
+    <h1>designsystem.build</h1>
+    <p>Figma Design System Plugin</p>
+  </div>
+  <span class="hdr-badge">v2.0</span>
+</div>
+
+<!-- Tab bar -->
+<div class="tabs">
+  <div class="tab active" data-tab="build">Build</div>
+  <div class="tab" data-tab="scan">Scan</div>
+  <div class="tab" data-tab="diff">Diff</div>
+  <div class="tab" data-tab="patch">Patch</div>
+  <div class="tab" data-tab="import">Import</div>
+</div>
+
+<!-- ═══════════════════════════════════════ BUILD ══════════════════════════════ -->
+<div class="body">
+<div id="screen-build" class="screen active">
+
+  <!-- Setup state -->
+  <div id="build-setup">
+    <div class="card card-info" style="margin-bottom:14px">
+      <div class="card-title">Build your Figma design system</div>
+      <div class="card-text">Creates variable collections, component sets, and documentation frames — all bound to your brand tokens.</div>
+    </div>
+
+    <div class="input-group">
+      <label class="input-label">Export token</label>
+      <input id="build-token" class="input" type="text" placeholder="dsb_xxxxxxxxxxxxxxxx" autocomplete="off" spellcheck="false">
+      <div class="input-hint">Get this from your project's Export tab on designsystem.build</div>
+    </div>
+
+    <div class="input-group">
+      <label class="input-label">Project ID <span style="font-weight:400;color:#94A3B8">(optional — auto-detected from token)</span></label>
+      <input id="build-project-id" class="input" type="text" placeholder="007c32ea-fae0-... (optional)" autocomplete="off">
+    </div>
+
+    <div class="section-hdr">Token architecture</div>
+    <div class="radio-group">
+      <div class="radio-opt selected" data-arch="two_tier" id="arch-two">2-Tier<br><span style="font-weight:400;color:#94A3B8">Global → Semantic</span></div>
+      <div class="radio-opt" data-arch="three_tier" id="arch-three">3-Tier<br><span style="font-weight:400;color:#94A3B8">+ Component tokens</span></div>
+    </div>
+
+    <div class="input-group">
+      <label class="input-label">API base URL</label>
+      <input id="build-api" class="input" type="text" value="https://designsystemforge-production.up.railway.app/api/v1">
+    </div>
+
+    <button class="btn btn-primary" id="btn-build">◈ Generate Figma file</button>
+    <button class="btn btn-secondary" id="btn-build-check">Preview before building</button>
+  </div>
+
+  <!-- Preview state -->
+  <div id="build-preview" style="display:none">
+    <div class="system-preview">
+      <div class="system-name" id="preview-name">Loading...</div>
+      <div class="system-badges" id="preview-badges"></div>
+    </div>
+    <div class="card" id="preview-summary"></div>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-primary" id="btn-build-confirm" style="flex:1">Generate now →</button>
+      <button class="btn btn-secondary btn-sm" id="btn-preview-back">Back</button>
+    </div>
+  </div>
+
+  <!-- Building state -->
+  <div id="build-progress" style="display:none">
+    <div class="progress-wrap">
+      <div class="progress-label">
+        <span id="build-step-label">Initialising...</span>
+        <span class="pct" id="build-pct">0%</span>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" id="build-bar"></div></div>
+    </div>
+    <div class="steps" id="build-steps"></div>
+  </div>
+
+  <!-- Done state -->
+  <div id="build-done" style="display:none">
+    <div class="card card-success" style="margin-bottom:12px">
+      <div class="card-title">✓ Design system built!</div>
+      <div class="card-text" id="done-summary">Your Figma file is ready.</div>
+    </div>
+    <div class="stats" id="done-stats"></div>
+    <button class="btn btn-secondary" id="btn-build-again">Build another project</button>
+  </div>
+
+  <!-- Error state -->
+  <div id="build-error" style="display:none">
+    <div class="card card-error">
+      <div class="card-title">Build failed</div>
+      <div class="card-text" id="build-error-msg"></div>
+    </div>
+    <button class="btn btn-secondary" id="btn-build-retry">Try again</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════ SCAN ════════════════════════════ -->
+<div id="screen-scan" class="screen">
+  <div class="card card-info" style="margin-bottom:14px">
+    <div class="card-title">Scan current Figma file</div>
+    <div class="card-text">Reads variables, styles, and components from this file and sends them to designsystem.build for review.</div>
+  </div>
+
+  <div id="scan-setup">
+    <div class="input-group">
+      <label class="input-label">Export token</label>
+      <input id="scan-token" class="input" type="text" placeholder="dsb_xxxxxxxxxxxxxxxx" autocomplete="off" spellcheck="false">
+    </div>
+    <div class="input-group">
+      <label class="input-label">Project ID</label>
+      <input id="scan-project-id" class="input" type="text" placeholder="007c32ea-..." autocomplete="off">
+    </div>
+    <div class="input-group">
+      <label class="input-label">File role</label>
+      <select class="select" id="scan-role">
+        <option value="MIXED">Mixed (colours + components)</option>
+        <option value="FOUNDATIONS">Foundations only (colours, spacing, typography)</option>
+        <option value="COMPONENTS">Components only</option>
+      </select>
+    </div>
+    <div class="input-group">
+      <label class="input-label">API base URL</label>
+      <input id="scan-api" class="input" type="text" value="https://designsystemforge-production.up.railway.app/api/v1">
+    </div>
+    <button class="btn btn-primary" id="btn-scan">⟳ Scan this file</button>
+  </div>
+
+  <div id="scan-progress" style="display:none">
+    <div class="progress-wrap">
+      <div class="progress-label">
+        <span id="scan-label">Scanning...</span>
+        <span class="pct" id="scan-pct">0%</span>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" id="scan-bar"></div></div>
+    </div>
+  </div>
+
+  <div id="scan-done" style="display:none">
+    <div class="card card-success">
+      <div class="card-title">✓ Scan complete</div>
+      <div class="card-text" id="scan-result-text"></div>
+    </div>
+    <div class="card" id="scan-changes-preview" style="display:none">
+      <div class="card-title" id="scan-changes-count"></div>
+      <div class="card-text">Open designsystem.build to review and apply changes.</div>
+    </div>
+    <button class="btn btn-secondary" id="btn-scan-again">Scan again</button>
+  </div>
+
+  <div id="scan-error" style="display:none">
+    <div class="card card-error">
+      <div class="card-title">Scan failed</div>
+      <div class="card-text" id="scan-error-msg"></div>
+    </div>
+    <button class="btn btn-secondary" id="btn-scan-retry">Try again</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════ DIFF ════════════════════════════ -->
+<div id="screen-diff" class="screen">
+  <div class="card card-info" style="margin-bottom:14px">
+    <div class="card-title">Diff — compare states</div>
+    <div class="card-text">Compare your Figma file against the canonical state on designsystem.build and see exactly what's changed.</div>
+  </div>
+
+  <div id="diff-setup">
+    <div class="input-group">
+      <label class="input-label">Export token</label>
+      <input id="diff-token" class="input" type="text" placeholder="dsb_xxxxxxxxxxxxxxxx" autocomplete="off" spellcheck="false">
+    </div>
+    <div class="input-group">
+      <label class="input-label">Project ID</label>
+      <input id="diff-project-id" class="input" type="text" placeholder="007c32ea-..." autocomplete="off">
+    </div>
+    <div class="input-group">
+      <label class="input-label">API base URL</label>
+      <input id="diff-api" class="input" type="text" value="https://designsystemforge-production.up.railway.app/api/v1">
+    </div>
+    <button class="btn btn-primary" id="btn-diff">Compare →</button>
+  </div>
+
+  <div id="diff-result" style="display:none">
+    <div class="section-hdr">Changes detected</div>
+    <div style="display:flex;gap:6px;margin-bottom:10px;align-items:center">
+      <button class="btn btn-secondary btn-sm" id="btn-diff-select-all">Select all</button>
+      <button class="btn btn-secondary btn-sm" id="btn-diff-deselect">Deselect</button>
+      <span style="margin-left:auto;font-size:11px;color:#94A3B8" id="diff-selection-count">0 selected</span>
+    </div>
+    <div class="change-list" id="diff-change-list"></div>
+    <button class="btn btn-primary" style="margin-top:12px" id="btn-apply-from-diff">Apply selected to Figma →</button>
+  </div>
+
+  <div id="diff-empty" style="display:none">
+    <div class="card card-success">
+      <div class="card-title">✓ In sync</div>
+      <div class="card-text">Your Figma file matches the canonical design system. No changes needed.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════ PATCH ═══════════════════════════ -->
+<div id="screen-patch" class="screen">
+  <div class="card card-warning" style="margin-bottom:14px">
+    <div class="card-title">Apply patch</div>
+    <div class="card-text">Applies only the changed variables and components — safer and faster than a full rebuild. Run Diff first to see what will change.</div>
+  </div>
+
+  <div id="patch-setup">
+    <div class="input-group">
+      <label class="input-label">Export token</label>
+      <input id="patch-token" class="input" type="text" placeholder="dsb_xxxxxxxxxxxxxxxx" autocomplete="off" spellcheck="false">
+    </div>
+    <div class="input-group">
+      <label class="input-label">Project ID</label>
+      <input id="patch-project-id" class="input" type="text" placeholder="007c32ea-..." autocomplete="off">
+    </div>
+    <div class="input-group">
+      <label class="input-label">API base URL</label>
+      <input id="patch-api" class="input" type="text" value="https://designsystemforge-production.up.railway.app/api/v1">
+    </div>
+    <button class="btn btn-primary" id="btn-patch">Apply patch →</button>
+  </div>
+
+  <div id="patch-progress" style="display:none">
+    <div class="progress-wrap">
+      <div class="progress-label">
+        <span id="patch-label">Patching...</span>
+        <span class="pct" id="patch-pct">0%</span>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" id="patch-bar"></div></div>
+    </div>
+  </div>
+
+  <div id="patch-done" style="display:none">
+    <div class="card card-success">
+      <div class="card-title">✓ Patch applied</div>
+      <div class="card-text" id="patch-result"></div>
+    </div>
+    <button class="btn btn-secondary" id="btn-patch-again">Apply another patch</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════ IMPORT ══════════════════════════ -->
+<div id="screen-import" class="screen">
+
+  <!-- How it works explainer -->
+  <div class="card" style="margin-bottom:12px;background:#F0FDF4;border-color:#BBF7D0">
+    <div class="card-title" style="color:#166534">How Figma → designsystem.build works</div>
+    <div style="font-size:11px;color:#166534;line-height:1.6;margin-top:4px">
+      <div style="margin-bottom:4px"><strong>Step 1</strong> — Create a project on designsystem.build first</div>
+      <div style="margin-bottom:4px"><strong>Step 2</strong> — Go to that project's Export tab and click <em>Export to Figma</em> to get your export token + project ID</div>
+      <div style="margin-bottom:4px"><strong>Step 3</strong> — Paste both below and click Import</div>
+      <div>Your Figma file's variables, styles, and components will be mapped into the project.</div>
+    </div>
+    <a href="https://design-system.up.railway.app/dashboard" target="_blank"
+      style="display:inline-flex;align-items:center;gap:6px;margin-top:10px;font-size:11px;font-weight:600;color:#166534;background:#BBF7D040;border:1px solid #86EFAC;border-radius:7px;padding:5px 10px;text-decoration:none">
+      ↗ Create a project first →
+    </a>
+  </div>
+
+  <div id="import-setup">
+    <div class="input-group">
+      <label class="input-label">Export token</label>
+      <input id="import-token" class="input" type="text" placeholder="dsb_xxxxxxxxxxxxxxxx" autocomplete="off" spellcheck="false">
+      <div class="input-hint">From your project's Export tab on designsystem.build</div>
+    </div>
+    <div class="input-group">
+      <label class="input-label">Project ID</label>
+      <input id="import-project-id" class="input" type="text" placeholder="007c32ea-fae0-..." autocomplete="off">
+      <div class="input-hint">Shown in the Export tab alongside the token</div>
+    </div>
+    <div class="input-group">
+      <label class="input-label">API base URL</label>
+      <input id="import-api" class="input" type="text" value="https://designsystemforge-production.up.railway.app/api/v1">
+    </div>
+    <div class="alert alert-warn" style="margin-bottom:12px">
+      <strong>Note:</strong> This will map your Figma file's variables into the project. Unrecognised tokens will be queued for review — nothing is overwritten without your approval.
+    </div>
+    <button class="btn btn-primary" id="btn-import">⟳ Scan &amp; import →</button>
+  </div>
+
+  <div id="import-done" style="display:none">
+    <div class="card card-success">
+      <div class="card-title">✓ Import sent for review</div>
+      <div class="card-text" id="import-result">Your Figma file has been scanned. Open designsystem.build to review and accept the changes.</div>
+    </div>
+    <a href="https://design-system.up.railway.app/dashboard" target="_blank"
+      style="display:block;text-align:center;margin-top:10px;font-size:12px;font-weight:600;color:#6366F1;text-decoration:none">
+      Open designsystem.build to review →
+    </a>
+    <button class="btn btn-secondary" id="btn-import-again" style="margin-top:8px">Import another file</button>
+  </div>
+</div>
+
+</div><!-- .body -->
+
+<script>
+// ─── Shared helpers ───────────────────────────────────────────────────────────
+const $ = id => document.getElementById(id);
+const show = id => { $(id) && ($(id).style.display = 'block'); };
+const hide = id => { $(id) && ($(id).style.display = 'none'); };
+
+// Tab switching
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    tab.classList.add('active');
+    $('screen-' + tab.dataset.tab).classList.add('active');
+  });
+});
+
+// Architecture selector
+document.querySelectorAll('[data-arch]').forEach(el => {
+  el.addEventListener('click', () => {
+    document.querySelectorAll('[data-arch]').forEach(e => e.classList.remove('selected'));
+    el.classList.add('selected');
+  });
+});
+
+// Restore saved state
+window.onload = async () => {
+  parent.postMessage({ pluginMessage: { type: 'restore-state' } }, '*');
+};
+
+// ─── Message handler from plugin code ────────────────────────────────────────
+window.onmessage = ev => {
+  const msg = ev.data.pluginMessage;
+  if (!msg) return;
+
+  // ── Restore persisted token/projectId ────────────────────────────────────
+  if (msg.type === 'restore-state') {
+    if (msg.token) {
+      ['build','scan','diff','patch','import'].forEach(tab => {
+        const el = $(tab + '-token'); if (el) el.value = msg.token;
+      });
+    }
+    if (msg.projectId) {
+      ['build','scan','diff','patch','import'].forEach(tab => {
+        const el = $(tab + '-project-id'); if (el) el.value = msg.projectId;
+      });
+    }
+    if (msg.apiBase) {
+      ['build','scan','diff','patch','import'].forEach(tab => {
+        const el = $(tab + '-api'); if (el) el.value = msg.apiBase;
+      });
+    }
+    return;
+  }
+
+  // ── Build: preview payload ────────────────────────────────────────────────
+  if (msg.type === 'build-preview') {
+    hide('build-setup');
+    show('build-preview');
+    $('preview-name').textContent = msg.name || 'Design System';
+    const badges = $('preview-badges');
+    badges.innerHTML = '';
+    (msg.badges || []).forEach(b => {
+      const el = document.createElement('span');
+      el.className = 'sys-badge brand';
+      el.textContent = b;
+      badges.appendChild(el);
+    });
+    $('preview-summary').innerHTML = `
+      <div class="card-title">Ready to generate</div>
+      <div class="card-text">
+        ${msg.tokenCount || 0} tokens · ${msg.componentCount || 0} components · ${msg.themeCount || 2} themes<br>
+        Architecture: <strong>${msg.arch === 'three_tier' ? '3-Tier (Global → Semantic → Component)' : '2-Tier (Global → Semantic)'}</strong>
+      </div>`;
+  }
+
+  // ── Build: progress ───────────────────────────────────────────────────────
+  if (msg.type === 'progress') {
+    hide('build-setup'); hide('build-preview'); hide('build-done'); hide('build-error');
+    show('build-progress');
+    $('build-bar').style.width = msg.pct + '%';
+    $('build-pct').textContent = msg.pct + '%';
+    $('build-step-label').textContent = msg.label;
+
+    const steps = $('build-steps');
+    if (msg.stepId && !steps.querySelector(`[data-step="${msg.stepId}"]`)) {
+      const div = document.createElement('div');
+      div.className = 'step active';
+      div.dataset.step = msg.stepId;
+      div.innerHTML = `<span class="step-icon"></span><span>${msg.label}</span>`;
+      steps.appendChild(div);
+    }
+    // Mark previous steps as done
+    steps.querySelectorAll('.step.active').forEach((s, i, all) => {
+      if (i < all.length - 1) {
+        s.className = 'step done';
+        s.querySelector('.step-icon').textContent = '';
+      }
+    });
+  }
+
+  // ── Build: done ───────────────────────────────────────────────────────────
+  if (msg.type === 'done') {
+    hide('build-progress');
+    show('build-done');
+    // Mark all steps done
+    $('build-steps').querySelectorAll('.step').forEach(s => {
+      s.className = 'step done';
+      s.querySelector('.step-icon').textContent = '';
+    });
+    $('done-summary').textContent = `Built ${msg.systemName || 'your design system'} in Figma. ${msg.variables || 0} variables · ${msg.components || 0} components across ${msg.pages || 0} pages.`;
+    const stats = $('done-stats');
+    stats.innerHTML = `
+      <div class="stat"><div class="stat-val">${msg.variables||0}</div><div class="stat-lbl">Variables</div></div>
+      <div class="stat"><div class="stat-val">${msg.components||0}</div><div class="stat-lbl">Components</div></div>
+      <div class="stat"><div class="stat-val">${msg.pages||0}</div><div class="stat-lbl">Pages</div></div>`;
+  }
+
+  // ── Build: error ──────────────────────────────────────────────────────────
+  if (msg.type === 'error') {
+    hide('build-progress');
+    show('build-error');
+    $('build-error-msg').textContent = msg.message || 'Unknown error';
+  }
+
+  // ── Scan: progress ────────────────────────────────────────────────────────
+  if (msg.type === 'scan-progress') {
+    hide('scan-setup');
+    show('scan-progress');
+    $('scan-bar').style.width = msg.pct + '%';
+    $('scan-pct').textContent = msg.pct + '%';
+    $('scan-label').textContent = msg.label;
+  }
+
+  // ── Scan: complete ────────────────────────────────────────────────────────
+  if (msg.type === 'scan-complete') {
+    hide('scan-progress');
+    show('scan-done');
+    const n = msg.changes?.length || 0;
+    $('scan-result-text').textContent = `Scan complete. Sent to designsystem.build for review.`;
+    if (n > 0) {
+      show('scan-changes-preview');
+      $('scan-changes-count').textContent = `${n} change${n===1?'':'s'} found`;
+    }
+  }
+
+  if (msg.type === 'scan-error') {
+    hide('scan-progress');
+    show('scan-error');
+    $('scan-error-msg').textContent = msg.message;
+  }
+
+  // ── Diff: result ──────────────────────────────────────────────────────────
+  if (msg.type === 'diff-result') {
+    const changes = msg.changes || [];
+    if (!changes.length) {
+      hide('diff-setup'); show('diff-empty'); return;
+    }
+    hide('diff-setup');
+    show('diff-result');
+    renderChangeList(changes, 'diff-change-list', 'diff-selection-count');
+  }
+
+  // ── Patch: progress / done ────────────────────────────────────────────────
+  if (msg.type === 'patch-progress') {
+    hide('patch-setup'); show('patch-progress');
+    $('patch-bar').style.width = msg.pct + '%';
+    $('patch-pct').textContent = msg.pct + '%';
+    $('patch-label').textContent = msg.label;
+  }
+  if (msg.type === 'patch-done') {
+    hide('patch-progress'); show('patch-done');
+    $('patch-result').textContent = msg.summary || 'Patch applied successfully.';
+  }
+
+  // ── Import: done ──────────────────────────────────────────────────────────
+  if (msg.type === 'import-done') {
+    hide('import-setup'); show('import-done');
+    $('import-result').textContent = msg.summary || 'Import complete. Open designsystem.build to review.';
+  }
+
+  // ── Variables skipped (free plan) ─────────────────────────────────────────
+  if (msg.type === 'variables-skipped') {
+    const el = document.createElement('div');
+    el.className = 'alert alert-warn';
+    el.style.marginTop = '8px';
+    el.textContent = msg.reason;
+    $('build-steps').after ? $('build-steps').after(el) : $('build-steps').parentNode.appendChild(el);
+  }
+};
+
+// ─── Change list renderer (used in Diff tab) ─────────────────────────────────
+let _changes = [], _selectedIds = new Set();
+
+function renderChangeList(changes, listId, countId) {
+  _changes = changes;
+  _selectedIds = new Set(changes.map(c => c.id));
+  const list = $(listId);
+  list.innerHTML = '';
+  changes.forEach(c => {
+    const item = document.createElement('div');
+    item.className = 'change-item';
+    item.dataset.id = c.id;
+    const typeClass = {color:'ct-color',typography:'ct-typography',spacing:'ct-spacing',radius:'ct-radius',shadow:'ct-shadow'}[c.type] || '';
+    const swatchHtml = c.newValue && /^#/.test(c.newValue)
+      ? `<span class="swatch" style="background:${c.newValue}"></span>` : '';
+    item.innerHTML = `
+      <div class="change-check checked" data-cid="${c.id}"></div>
+      <div class="change-meta">
+        <div class="change-field">${c.label || c.field}</div>
+        <div class="change-values">
+          <span class="change-old">${c.oldValue ?? '—'}</span>
+          <span class="change-arrow">→</span>
+          ${swatchHtml}
+          <span class="change-new">${c.newValue ?? '—'}</span>
+        </div>
+      </div>
+      <span class="change-type ${typeClass}">${c.type}</span>`;
+    item.addEventListener('click', () => toggleChange(c.id, item));
+    list.appendChild(item);
+  });
+  updateSelectionCount(countId);
+}
+
+function toggleChange(id, item) {
+  const check = item.querySelector('.change-check');
+  if (_selectedIds.has(id)) {
+    _selectedIds.delete(id);
+    check.classList.remove('checked');
+  } else {
+    _selectedIds.add(id);
+    check.classList.add('checked');
+  }
+  updateSelectionCount('diff-selection-count');
+}
+
+function updateSelectionCount(countId) {
+  const el = $(countId);
+  if (el) el.textContent = `${_selectedIds.size} of ${_changes.length} selected`;
+}
+
+// ─── UI event handlers ────────────────────────────────────────────────────────
+
+function getInputs(prefix) {
+  return {
+    token:     $(prefix + '-token')?.value?.trim(),
+    projectId: $(prefix + '-project-id')?.value?.trim(),
+    apiBase:   $(prefix + '-api')?.value?.trim() || 'https://designsystemforge-production.up.railway.app/api/v1',
+  };
+}
+
+// BUILD
+$('btn-build-check')?.addEventListener('click', () => {
+  const { token, projectId, apiBase } = getInputs('build');
+  if (!token) { alert('Enter your export token'); return; }
+  parent.postMessage({ pluginMessage: { type: 'build-preview', token, projectId, apiBase } }, '*');
+});
+
+$('btn-build')?.addEventListener('click', () => {
+  const { token, projectId, apiBase } = getInputs('build');
+  if (!token) { alert('Enter your export token'); return; }
+  const arch = document.querySelector('[data-arch].selected')?.dataset?.arch || 'two_tier';
+  hide('build-setup');
+  parent.postMessage({ pluginMessage: { type: 'start', token, projectId, apiBase, arch } }, '*');
+});
+
+$('btn-build-confirm')?.addEventListener('click', () => {
+  const { token, projectId, apiBase } = getInputs('build');
+  const arch = document.querySelector('[data-arch].selected')?.dataset?.arch || 'two_tier';
+  parent.postMessage({ pluginMessage: { type: 'start', token, projectId, apiBase, arch } }, '*');
+});
+
+$('btn-preview-back')?.addEventListener('click', () => {
+  hide('build-preview'); show('build-setup');
+});
+
+$('btn-build-again')?.addEventListener('click', () => {
+  hide('build-done'); show('build-setup');
+  $('build-steps').innerHTML = '';
+});
+
+$('btn-build-retry')?.addEventListener('click', () => {
+  hide('build-error'); show('build-setup');
+});
+
+// SCAN
+$('btn-scan')?.addEventListener('click', () => {
+  const { token, projectId, apiBase } = getInputs('scan');
+  if (!token || !projectId) { alert('Enter token and project ID'); return; }
+  const fileRole = $('scan-role')?.value || 'MIXED';
+  parent.postMessage({ pluginMessage: { type: 'scan', token, projectId, apiBase, fileRole } }, '*');
+});
+
+$('btn-scan-again')?.addEventListener('click', () => {
+  hide('scan-done'); show('scan-setup');
+});
+$('btn-scan-retry')?.addEventListener('click', () => {
+  hide('scan-error'); show('scan-setup');
+});
+
+// DIFF
+$('btn-diff')?.addEventListener('click', () => {
+  const { token, projectId, apiBase } = getInputs('diff');
+  if (!token || !projectId) { alert('Enter token and project ID'); return; }
+  parent.postMessage({ pluginMessage: { type: 'diff', token, projectId, apiBase } }, '*');
+});
+
+$('btn-diff-select-all')?.addEventListener('click', () => {
+  _selectedIds = new Set(_changes.map(c => c.id));
+  document.querySelectorAll('.change-check').forEach(el => el.classList.add('checked'));
+  updateSelectionCount('diff-selection-count');
+});
+
+$('btn-diff-deselect')?.addEventListener('click', () => {
+  _selectedIds.clear();
+  document.querySelectorAll('.change-check').forEach(el => el.classList.remove('checked'));
+  updateSelectionCount('diff-selection-count');
+});
+
+$('btn-apply-from-diff')?.addEventListener('click', () => {
+  const { token, projectId, apiBase } = getInputs('diff');
+  const selectedChanges = _changes.filter(c => _selectedIds.has(c.id));
+  parent.postMessage({ pluginMessage: { type: 'apply-patch', token, projectId, apiBase, changes: selectedChanges } }, '*');
+});
+
+// PATCH
+$('btn-patch')?.addEventListener('click', () => {
+  const { token, projectId, apiBase } = getInputs('patch');
+  if (!token || !projectId) { alert('Enter token and project ID'); return; }
+  parent.postMessage({ pluginMessage: { type: 'patch', token, projectId, apiBase } }, '*');
+});
+$('btn-patch-again')?.addEventListener('click', () => {
+  hide('patch-done'); show('patch-setup');
+});
+
+// IMPORT
+$('btn-import')?.addEventListener('click', () => {
+  const { token, projectId, apiBase } = getInputs('import');
+  if (!token || !projectId) { alert('Enter token and project ID'); return; }
+  if (!confirm('This will overwrite the project\'s current brand config. Continue?')) return;
+  parent.postMessage({ pluginMessage: { type: 'import-to-website', token, projectId, apiBase } }, '*');
+});
+$('btn-import-again')?.addEventListener('click', () => {
+  hide('import-done'); show('import-setup');
+});
+</script>
+</body>
+</html>
