@@ -543,10 +543,18 @@ window.onmessage = ev => {
     });
     $('done-summary').textContent = `Built ${msg.systemName || 'your design system'} in Figma. ${msg.variables || 0} variables · ${msg.components || 0} components across ${msg.pages || 0} pages.`;
     const stats = $('done-stats');
+    const scoreColor = !msg.healthScore ? '#64748b' : msg.healthScore >= 80 ? '#16a34a' : msg.healthScore >= 60 ? '#d97706' : '#dc2626';
+    const scoreLabel = !msg.healthScore ? '—' : msg.healthScore >= 80 ? 'Excellent' : msg.healthScore >= 60 ? 'Good' : 'Needs work';
     stats.innerHTML = `
       <div class="stat"><div class="stat-val">${msg.variables||0}</div><div class="stat-lbl">Variables</div></div>
       <div class="stat"><div class="stat-val">${msg.components||0}</div><div class="stat-lbl">Components</div></div>
       <div class="stat"><div class="stat-val">${msg.pages||0}</div><div class="stat-lbl">Pages</div></div>`;
+    if (msg.healthScore !== null && msg.healthScore !== undefined) {
+      const scoreWrap = document.createElement('div');
+      scoreWrap.style.cssText = 'display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:8px;background:#f8fafc;border:1px solid #e2e8f0;margin-top:12px;';
+      scoreWrap.innerHTML = '<div style="width:36px;height:36px;border-radius:50%;border:2.5px solid ' + scoreColor + ';display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:' + scoreColor + '">' + msg.healthScore + '</div><div><div style="font-size:12px;font-weight:600;color:#0f172a">Health score</div><div style="font-size:10px;color:#64748b">' + scoreLabel + '</div></div>';
+      $('done-stats').appendChild(scoreWrap);
+    }
   }
 
   // ── Build: error ──────────────────────────────────────────────────────────
@@ -570,10 +578,25 @@ window.onmessage = ev => {
     hide('scan-progress');
     show('scan-done');
     const n = msg.changes?.length || 0;
-    $('scan-result-text').textContent = `Scan complete. Sent to designsystem.build for review.`;
+    const tokenChanges = (msg.changes || []).filter(c => ['color','typography','spacing','radius','shadow'].includes(c.type));
+    $('scan-result-text').textContent = n > 0
+      ? `${n} change${n===1?'':'s'} sent for review.`
+      : 'No changes — Figma variables match the current system.';
     if (n > 0) {
       show('scan-changes-preview');
-      $('scan-changes-count').textContent = `${n} change${n===1?'':'s'} found`;
+      $('scan-changes-count').textContent = `${tokenChanges.length} token change${tokenChanges.length!==1?'s':''} will update your health score`;
+      const cardText = document.querySelector('#scan-changes-preview .card-text');
+      if (cardText) cardText.innerHTML = 'Open designsystem.build to review, accept and update your score.';
+      if (msg.projectId && !document.getElementById('btn-review-sync')) {
+        const a = document.createElement('a');
+        a.id = 'btn-review-sync';
+        a.href = 'https://design-system.up.railway.app/projects/' + msg.projectId + '/figma-sync';
+        a.target = '_blank';
+        a.className = 'btn btn-primary';
+        a.style.cssText = 'display:flex;align-items:center;justify-content:center;gap:6px;margin-top:12px;text-decoration:none;';
+        a.textContent = 'Review & apply changes →';
+        $('scan-done').appendChild(a);
+      }
     }
   }
 
