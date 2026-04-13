@@ -167,21 +167,13 @@ body{background:#fff;width:100%;min-height:580px;overflow-x:hidden;overflow-y:au
       <div class="input-hint">Get this from your project's Export tab on designsystem.build</div>
     </div>
 
-    <div class="input-group">
-      <label class="input-label">Project ID <span style="font-weight:400;color:#94A3B8">(optional — auto-detected from token)</span></label>
-      <input id="build-project-id" class="input" type="text" placeholder="007c32ea-fae0-... (optional)" autocomplete="off">
-    </div>
-
     <div class="section-hdr">Token architecture</div>
     <div class="radio-group">
       <div class="radio-opt selected" data-arch="two_tier" id="arch-two">2-Tier<br><span style="font-weight:400;color:#94A3B8">Global → Semantic</span></div>
       <div class="radio-opt" data-arch="three_tier" id="arch-three">3-Tier<br><span style="font-weight:400;color:#94A3B8">+ Component tokens</span></div>
     </div>
 
-    <div class="input-group">
-      <label class="input-label">API base URL</label>
-      <input id="build-api" class="input" type="text" value="https://designsystemforge-production.up.railway.app/api/v1">
-    </div>
+    
 
     <button class="btn btn-primary" id="btn-build">◈ Generate Figma file</button>
     <button class="btn btn-secondary" id="btn-build-check">Preview before building</button>
@@ -244,10 +236,7 @@ body{background:#fff;width:100%;min-height:580px;overflow-x:hidden;overflow-y:au
       <label class="input-label">Export token</label>
       <input id="scan-token" class="input" type="text" placeholder="dsb_xxxxxxxxxxxxxxxx" autocomplete="off" spellcheck="false">
     </div>
-    <div class="input-group">
-      <label class="input-label">Project ID</label>
-      <input id="scan-project-id" class="input" type="text" placeholder="007c32ea-..." autocomplete="off">
-    </div>
+    
     <div class="input-group">
       <label class="input-label">File role</label>
       <select class="select" id="scan-role">
@@ -256,10 +245,7 @@ body{background:#fff;width:100%;min-height:580px;overflow-x:hidden;overflow-y:au
         <option value="COMPONENTS">Components only</option>
       </select>
     </div>
-    <div class="input-group">
-      <label class="input-label">API base URL</label>
-      <input id="scan-api" class="input" type="text" value="https://designsystemforge-production.up.railway.app/api/v1">
-    </div>
+    
     <button class="btn btn-primary" id="btn-scan">⟳ Scan this file</button>
   </div>
 
@@ -306,14 +292,8 @@ body{background:#fff;width:100%;min-height:580px;overflow-x:hidden;overflow-y:au
       <label class="input-label">Export token</label>
       <input id="diff-token" class="input" type="text" placeholder="dsb_xxxxxxxxxxxxxxxx" autocomplete="off" spellcheck="false">
     </div>
-    <div class="input-group">
-      <label class="input-label">Project ID</label>
-      <input id="diff-project-id" class="input" type="text" placeholder="007c32ea-..." autocomplete="off">
-    </div>
-    <div class="input-group">
-      <label class="input-label">API base URL</label>
-      <input id="diff-api" class="input" type="text" value="https://designsystemforge-production.up.railway.app/api/v1">
-    </div>
+    
+    
     <button class="btn btn-primary" id="btn-diff">Compare →</button>
   </div>
 
@@ -348,14 +328,8 @@ body{background:#fff;width:100%;min-height:580px;overflow-x:hidden;overflow-y:au
       <label class="input-label">Export token</label>
       <input id="patch-token" class="input" type="text" placeholder="dsb_xxxxxxxxxxxxxxxx" autocomplete="off" spellcheck="false">
     </div>
-    <div class="input-group">
-      <label class="input-label">Project ID</label>
-      <input id="patch-project-id" class="input" type="text" placeholder="007c32ea-..." autocomplete="off">
-    </div>
-    <div class="input-group">
-      <label class="input-label">API base URL</label>
-      <input id="patch-api" class="input" type="text" value="https://designsystemforge-production.up.railway.app/api/v1">
-    </div>
+    
+    
     <button class="btn btn-primary" id="btn-patch">Apply patch →</button>
   </div>
 
@@ -402,15 +376,8 @@ body{background:#fff;width:100%;min-height:580px;overflow-x:hidden;overflow-y:au
       <input id="import-token" class="input" type="text" placeholder="dsb_xxxxxxxxxxxxxxxx" autocomplete="off" spellcheck="false">
       <div class="input-hint">From your project's Export tab on designsystem.build</div>
     </div>
-    <div class="input-group">
-      <label class="input-label">Project ID</label>
-      <input id="import-project-id" class="input" type="text" placeholder="007c32ea-fae0-..." autocomplete="off">
-      <div class="input-hint">Shown in the Export tab alongside the token</div>
-    </div>
-    <div class="input-group">
-      <label class="input-label">API base URL</label>
-      <input id="import-api" class="input" type="text" value="https://designsystemforge-production.up.railway.app/api/v1">
-    </div>
+    
+    
     <div class="alert alert-warn" style="margin-bottom:12px">
       <strong>Note:</strong> This will map your Figma file's variables into the project. Unrecognised tokens will be queued for review — nothing is overwritten without your approval.
     </div>
@@ -473,15 +440,9 @@ window.onmessage = ev => {
         const el = $(tab + '-token'); if (el) el.value = msg.token;
       });
     }
-    if (msg.projectId) {
-      ['build','scan','diff','patch','import'].forEach(tab => {
-        const el = $(tab + '-project-id'); if (el) el.value = msg.projectId;
-      });
+    );
     }
-    if (msg.apiBase) {
-      ['build','scan','diff','patch','import'].forEach(tab => {
-        const el = $(tab + '-api'); if (el) el.value = msg.apiBase;
-      });
+    );
     }
     return;
   }
@@ -697,11 +658,12 @@ function updateSelectionCount(countId) {
 
 // ─── UI event handlers ────────────────────────────────────────────────────────
 
+const API_BASE = 'https://designsystemforge-production.up.railway.app/api/v1';
 function getInputs(prefix) {
   return {
     token:     $(prefix + '-token')?.value?.trim(),
-    projectId: $(prefix + '-project-id')?.value?.trim(),
-    apiBase:   $(prefix + '-api')?.value?.trim() || 'https://designsystemforge-production.up.railway.app/api/v1',
+    projectId: '',   // derived server-side from the export token
+    apiBase:   API_BASE,
   };
 }
 
@@ -742,7 +704,7 @@ $('btn-build-retry')?.addEventListener('click', () => {
 // SCAN
 $('btn-scan')?.addEventListener('click', () => {
   const { token, projectId, apiBase } = getInputs('scan');
-  if (!token || !projectId) { alert('Enter token and project ID'); return; }
+  if (!token) { alert('Enter your export token'); return; }
   const fileRole = $('scan-role')?.value || 'MIXED';
   parent.postMessage({ pluginMessage: { type: 'scan', token, projectId, apiBase, fileRole } }, '*');
 });
@@ -757,7 +719,7 @@ $('btn-scan-retry')?.addEventListener('click', () => {
 // DIFF
 $('btn-diff')?.addEventListener('click', () => {
   const { token, projectId, apiBase } = getInputs('diff');
-  if (!token || !projectId) { alert('Enter token and project ID'); return; }
+  if (!token) { alert('Enter your export token'); return; }
   parent.postMessage({ pluginMessage: { type: 'diff', token, projectId, apiBase } }, '*');
 });
 
@@ -782,7 +744,7 @@ $('btn-apply-from-diff')?.addEventListener('click', () => {
 // PATCH
 $('btn-patch')?.addEventListener('click', () => {
   const { token, projectId, apiBase } = getInputs('patch');
-  if (!token || !projectId) { alert('Enter token and project ID'); return; }
+  if (!token) { alert('Enter your export token'); return; }
   parent.postMessage({ pluginMessage: { type: 'patch', token, projectId, apiBase } }, '*');
 });
 $('btn-patch-again')?.addEventListener('click', () => {
@@ -792,7 +754,7 @@ $('btn-patch-again')?.addEventListener('click', () => {
 // IMPORT
 $('btn-import')?.addEventListener('click', () => {
   const { token, projectId, apiBase } = getInputs('import');
-  if (!token || !projectId) { alert('Enter token and project ID'); return; }
+  if (!token) { alert('Enter your export token'); return; }
   if (!confirm('This will overwrite the project\'s current brand config. Continue?')) return;
   parent.postMessage({ pluginMessage: { type: 'import-to-website', token, projectId, apiBase } }, '*');
 });
