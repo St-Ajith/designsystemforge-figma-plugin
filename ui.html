@@ -419,15 +419,6 @@ window.onmessage = ev => {
   if (!msg) return;
 
   // ── Restore persisted token/projectId ────────────────────────────────────
-  if (msg.type === 'restore-state') {
-    if (msg.token) {
-      ['build','scan','diff','patch','import'].forEach(tab => {
-        const el = $(tab + '-token'); if (el) el.value = msg.token;
-      });
-    }
-    return;
-  }
-
   // ── Build: preview payload ────────────────────────────────────────────────
   if (msg.type === 'build-preview') {
     hide('build-setup');
@@ -584,6 +575,71 @@ window.onmessage = ev => {
     el.style.marginTop = '8px';
     el.textContent = msg.reason;
     $('build-steps').after ? $('build-steps').after(el) : $('build-steps').parentNode.appendChild(el);
+  }
+
+  // ── Diff: progress ────────────────────────────────────────────────────────
+  if (msg.type === 'diff-progress') {
+    hide('diff-setup'); show('diff-result');
+    const pct = msg.pct || 0;
+    const bar = $('diff-bar'); if (bar) bar.style.width = pct + '%';
+    const lbl = $('diff-label'); if (lbl) lbl.textContent = msg.label || 'Scanning...';
+  }
+
+  // ── Diff: error ───────────────────────────────────────────────────────────
+  if (msg.type === 'diff-error') {
+    hide('diff-setup'); hide('diff-result');
+    show('diff-error-state');
+    const el = $('diff-error-msg'); if (el) el.textContent = msg.message;
+  }
+
+  // ── Import: progress ──────────────────────────────────────────────────────
+  if (msg.type === 'import-progress') {
+    hide('import-setup'); show('import-progress');
+    const bar = $('import-bar'); if (bar) bar.style.width = (msg.pct || 0) + '%';
+    const lbl = $('import-label'); if (lbl) lbl.textContent = msg.label || 'Importing...';
+  }
+
+  // ── Import: error ─────────────────────────────────────────────────────────
+  if (msg.type === 'import-error') {
+    hide('import-progress');
+    show('import-error');
+    const el = $('import-error-msg'); if (el) el.textContent = msg.message;
+  }
+
+  // ── Patch: error ──────────────────────────────────────────────────────────
+  if (msg.type === 'patch-error') {
+    hide('patch-progress');
+    show('patch-error');
+    const el = $('patch-error-msg'); if (el) el.textContent = msg.message;
+  }
+
+  // ── Push: error ───────────────────────────────────────────────────────────
+  if (msg.type === 'push-error') {
+    show('scan-done');
+    const el = $('scan-result-text'); if (el) el.textContent = 'Push failed: ' + msg.message;
+  }
+
+  // ── Component error (non-fatal — shown inline during build) ───────────────
+  if (msg.type === 'component-error') {
+    const el = document.createElement('div');
+    el.style.cssText = 'color:#F87171;font-size:11px;margin-top:4px;';
+    el.textContent = '⚠ ' + (msg.component || '') + ': ' + msg.message;
+    const steps = $('build-steps');
+    if (steps) steps.appendChild(el);
+  }
+
+  // ── Log (debug) ───────────────────────────────────────────────────────────
+  if (msg.type === 'log') {
+    // Non-fatal — silently ignore in production
+  }
+
+  // ── restore-token (save token for next session) ───────────────────────────
+  if (msg.type === 'restore-token') {
+    if (msg.token) {
+      ['build','scan','diff','patch','import'].forEach(tab => {
+        const el = $(tab + '-token'); if (el && !el.value) el.value = msg.token;
+      });
+    }
   }
 };
 
