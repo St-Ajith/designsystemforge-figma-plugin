@@ -134,7 +134,7 @@ body{background:#fff;width:100%;min-height:580px;overflow-x:hidden;overflow-y:au
     <h1>designsystem.build</h1>
     <p>Figma Design System Plugin</p>
   </div>
-  <span class="hdr-badge">v2.0</span>
+  <span class="hdr-badge">v2.1</span>
 </div>
 
 <!-- Tab bar -->
@@ -406,13 +406,7 @@ document.querySelectorAll('.tab').forEach(tab => {
   });
 });
 
-// Architecture selector
-document.querySelectorAll('[data-arch]').forEach(el => {
-  el.addEventListener('click', () => {
-    document.querySelectorAll('[data-arch]').forEach(e => e.classList.remove('selected'));
-    el.classList.add('selected');
-  });
-});
+// Architecture selector removed
 
 // Restore saved state
 window.onload = async () => {
