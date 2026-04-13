@@ -118,10 +118,6 @@ body{background:#fff;width:100%;min-height:580px;overflow-x:hidden;overflow-y:au
 .alert-info{background:#EFF6FF;border:1px solid #BFDBFE;color:#1E40AF}
 
 /* ── Radio buttons ── */
-.radio-group{width:100%;box-sizing:border-box;display:flex;gap:6px;margin-bottom:10px}
-.radio-opt{flex:1;text-align:center;padding:7px;border:1.5px solid #E2E8F0;border-radius:7px;font-size:11px;font-weight:600;color:#64748B;cursor:pointer;transition:all .15s}
-.radio-opt.selected{border-color:#6366F1;background:#6366F115;color:#6366F1}
-
 /* ── Architecture pill ── */
 .arch-badge{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:700;padding:3px 8px;border-radius:5px;background:#5F3DC415;color:#7C3AED;border:1px solid #7C3AED30;margin-bottom:8px}
 
@@ -165,12 +161,6 @@ body{background:#fff;width:100%;min-height:580px;overflow-x:hidden;overflow-y:au
       <label class="input-label">Export token</label>
       <input id="build-token" class="input" type="text" placeholder="dsb_xxxxxxxxxxxxxxxx" autocomplete="off" spellcheck="false">
       <div class="input-hint">Get this from your project's Export tab on designsystem.build</div>
-    </div>
-
-    <div class="section-hdr">Token architecture</div>
-    <div class="radio-group">
-      <div class="radio-opt selected" data-arch="two_tier" id="arch-two">2-Tier<br><span style="font-weight:400;color:#94A3B8">Global → Semantic</span></div>
-      <div class="radio-opt" data-arch="three_tier" id="arch-three">3-Tier<br><span style="font-weight:400;color:#94A3B8">+ Component tokens</span></div>
     </div>
 
     
@@ -677,15 +667,13 @@ $('btn-build-check')?.addEventListener('click', () => {
 $('btn-build')?.addEventListener('click', () => {
   const { token, projectId, apiBase } = getInputs('build');
   if (!token) { alert('Enter your export token'); return; }
-  const arch = document.querySelector('[data-arch].selected')?.dataset?.arch || 'two_tier';
-  hide('build-setup');
-  parent.postMessage({ pluginMessage: { type: 'start', token, projectId, apiBase, arch } }, '*');
+    hide('build-setup');
+  parent.postMessage({ pluginMessage: { type: 'start', token, projectId, apiBase, arch: 'two_tier' } }, '*');
 });
 
 $('btn-build-confirm')?.addEventListener('click', () => {
   const { token, projectId, apiBase } = getInputs('build');
-  const arch = document.querySelector('[data-arch].selected')?.dataset?.arch || 'two_tier';
-  parent.postMessage({ pluginMessage: { type: 'start', token, projectId, apiBase, arch } }, '*');
+    parent.postMessage({ pluginMessage: { type: 'start', token, projectId, apiBase, arch: 'two_tier' } }, '*');
 });
 
 $('btn-preview-back')?.addEventListener('click', () => {
