@@ -68,3 +68,23 @@ Tokens expire after 1 hour. Go back to the Export tab and generate a new one.
 Once approved: [Figma Community](https://www.figma.com/community/plugin/1623830472453970738)
 
 Built with ❤️ by [designsystem.build](https://design-system.up.railway.app) · [LinkedIn](https://www.linkedin.com/in/ajith-kumar-v/)
+
+---
+
+## Changelog
+
+### v1.4.0 — April 2026
+- **Light + Dark side-by-side** — Variants section now renders both Light and Dark mode cards next to each other. No more mode-toggling in the Variables panel — see both themes at a glance.
+- **Real Figma variable modes** — `Semantic/Colors` and `Component/Tokens` collections now have proper Light and Dark modes. Switching the collection mode in Figma updates all token-bound colours automatically.
+- **Custom colour overrides flow to Figma** — Colours customised in the web app (via the Customise editor) are now exported as real Figma variables in the correct mode (Light or Dark).
+
+### v1.3.0
+- Button spec v2: Danger variant, icon-only sizes, per-variant colour customisation
+- Font size corrections: SM=14px, MD=16px, LG=18px
+
+### v1.2.0
+- All 25 component anatomy handlers implemented
+- Snackbar, tag, input, list, radio, tooltip shapes rebuilt from scratch
+- ComponentSet (purple dashed border) for all variant grids
+
+---
