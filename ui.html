@@ -661,13 +661,16 @@ function getInputs(prefix) {
 $('btn-build-check')?.addEventListener('click', () => {
   const { token, projectId, apiBase } = getInputs('build');
   if (!token) { alert('Enter your export token'); return; }
+  const btn = $('btn-build-check');
+  if (btn) { btn.textContent = 'Loading preview…'; btn.disabled = true; }
   parent.postMessage({ pluginMessage: { type: 'build-preview', token, projectId, apiBase } }, '*');
 });
 
 $('btn-build')?.addEventListener('click', () => {
   const { token, projectId, apiBase } = getInputs('build');
   if (!token) { alert('Enter your export token'); return; }
-    hide('build-setup');
+  hide('build-setup');
+  show('build-progress');
   parent.postMessage({ pluginMessage: { type: 'start', token, projectId, apiBase, arch: 'two_tier' } }, '*');
 });
 
@@ -678,6 +681,8 @@ $('btn-build-confirm')?.addEventListener('click', () => {
 
 $('btn-preview-back')?.addEventListener('click', () => {
   hide('build-preview'); show('build-setup');
+  const checkBtn = $('btn-build-check');
+  if (checkBtn) { checkBtn.textContent = 'Preview before building'; checkBtn.disabled = false; }
 });
 
 $('btn-build-again')?.addEventListener('click', () => {
@@ -694,6 +699,8 @@ $('btn-scan')?.addEventListener('click', () => {
   const { token, projectId, apiBase } = getInputs('scan');
   if (!token) { alert('Enter your export token'); return; }
   const fileRole = $('scan-role')?.value || 'MIXED';
+  hide('scan-setup');
+  show('scan-progress');
   parent.postMessage({ pluginMessage: { type: 'scan', token, projectId, apiBase, fileRole } }, '*');
 });
 
