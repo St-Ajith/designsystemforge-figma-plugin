@@ -797,7 +797,6 @@ $('btn-patch-again')?.addEventListener('click', () => {
 $('btn-import')?.addEventListener('click', () => {
   const { token, projectId, apiBase } = getInputs('import');
   if (!token) { alert('Enter your export token'); return; }
-  if (!confirm('This will overwrite the project\'s current brand config. Continue?')) return;
   parent.postMessage({ pluginMessage: { type: 'import-to-website', token, projectId, apiBase } }, '*');
 });
 $('btn-import-again')?.addEventListener('click', () => {
