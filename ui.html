@@ -40,6 +40,16 @@ body{background:#fff;width:100%;min-height:580px;overflow-x:hidden;overflow-y:au
 .btn-danger{background:#FEF2F2;color:#DC2626;border:1px solid #FECACA;margin-top:8px}
 .btn-sm{padding:6px 12px;width:auto;font-size:11px;border-radius:7px}
 
+/* ── Version footer ── */
+.footer{border-top:1px solid #E2E8F0;background:#F8FAFC;padding:8px 16px;font-size:10px;color:#94A3B8;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.footer-version{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.02em}
+.footer-update{display:none;color:#B45309;background:#FEF3C7;border:1px solid #FDE68A;padding:2px 8px;border-radius:10px;font-weight:600;text-decoration:none;transition:all .15s}
+.footer-update:hover{background:#FDE68A;color:#78350F}
+.footer-update.visible{display:inline-flex;align-items:center;gap:4px}
+.footer-ok{color:#16A34A;font-weight:600}
+.footer-changelog{color:#6366F1;text-decoration:none}
+.footer-changelog:hover{text-decoration:underline}
+
 /* ── Progress ── */
 .progress-wrap{margin:14px 0}
 .progress-label{display:flex;justify-content:space-between;margin-bottom:6px}
@@ -390,6 +400,14 @@ body{background:#fff;width:100%;min-height:580px;overflow-x:hidden;overflow-y:au
 
 </div><!-- .body -->
 
+<!-- Version footer — populated by the plugin via 'current-version' + 'version-check' messages -->
+<div class="footer">
+  <span class="footer-version" id="footer-version">v—</span>
+  <span id="footer-status-wrap">
+    <a href="#" class="footer-update" id="footer-update" target="_blank" rel="noopener">Update available →</a>
+  </span>
+</div>
+
 <script>
 // ─── Shared helpers ───────────────────────────────────────────────────────────
 const $ = id => document.getElementById(id);
@@ -417,6 +435,30 @@ window.onload = async () => {
 window.onmessage = ev => {
   const msg = ev.data.pluginMessage;
   if (!msg) return;
+
+  // ── Version footer: 'current-version' fires immediately on startup,
+  //    'version-check' fires after the async API call completes ──────────
+  if (msg.type === 'current-version') {
+    const v = $('footer-version');
+    if (v) v.textContent = 'v' + (msg.version || '—');
+    return;
+  }
+  if (msg.type === 'version-check') {
+    const v = $('footer-version');
+    if (v) v.textContent = 'v' + (msg.current || '—');
+    const u = $('footer-update');
+    if (u && msg.outdated && msg.downloadUrl) {
+      u.href = msg.downloadUrl;
+      u.textContent = 'v' + msg.latest + ' available →';
+      u.classList.add('visible');
+    } else if (u) {
+      u.classList.remove('visible');
+      // When up-to-date, show a discreet green checkmark instead
+      const wrap = $('footer-status-wrap');
+      if (wrap) wrap.innerHTML = '<span class="footer-ok">✓ Up to date</span>';
+    }
+    return;
+  }
 
   // ── Restore persisted token/projectId ────────────────────────────────────
   // ── Build: preview payload ────────────────────────────────────────────────
